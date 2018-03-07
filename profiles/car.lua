@@ -466,12 +466,6 @@ function process_turn(profile, turn)
     end
   end
 
-  -- penalize leaving the motorway to prevent divebombs
-  -- we want to prevent divebombs whether we route based on distance or duration
-  if turn.source_is_motorway and turn.target_is_link then
-     turn.weight = turn.weight * 2 + 300  -- @CHAUTODO #arbitrarynumber
-  end
-
   -- for distance based routing we don't want to have penalties based on turn angle
   if profile.properties.weight_name == 'distance' then
      turn.weight = 0
@@ -479,11 +473,24 @@ function process_turn(profile, turn)
      turn.weight = turn.duration
   end
 
+  local changed = false
+  -- penalize leaving the motorway to prevent divebombs
+  if turn.source_is_motorway and turn.target_is_link then
+    local old_turn_weight = turn.weight;
+    turn.weight = turn.weight * 2.0 + 300  -- @CHAUTODO #arbitrarynumber
+    print('found a motorway exit; changing from ' .. tostring(old_turn_weight) .. ' to ' .. tostring(turn.weight))
+    changed = true
+  end
+
   if profile.properties.weight_name == 'routability' then
       -- penalize turns from non-local access only segments onto local access only tags
       if not turn.source_restricted and turn.target_restricted then
           turn.weight = constants.max_turn_weight
       end
+  end
+
+  if changed then
+    print(tostring(turn.weight))
   end
 end
 
