@@ -10,7 +10,7 @@ limit = require("lib/maxspeed").limit
 
 function setup()
   local default_speed = 15
-  local walking_speed = 6
+  local walking_speed = 4
 
   return {
     properties = {
@@ -379,7 +379,7 @@ function handle_bicycle_tags(profile,way,result,data)
   if cycleway and string.find(cycleway, "opposite") == 1 then
     if reverse then
       has_cycleway_right = true
-  else
+    else
       has_cycleway_left = true
     end
   elseif cycleway and profile.cycleway_tags[cycleway] then
@@ -389,13 +389,12 @@ function handle_bicycle_tags(profile,way,result,data)
     has_cycleway_right = result.forward_mode ~= mode.inaccessible
   end
 
-
-  if has_cycleway_left then
+  if has_cycleway_left and result.backward_mode ~= mode.inaccessible then
     result.backward_mode = mode.cycling
     result.backward_speed = profile.bicycle_speeds["cycleway"]
   end
 
-  if has_cycleway_right then
+  if has_cycleway_right and result.forward_mode ~= mode.inaccessible then
     result.forward_mode = mode.cycling
     result.forward_speed = profile.bicycle_speeds["cycleway"]
   end
