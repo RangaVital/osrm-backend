@@ -575,6 +575,9 @@ function process_turn(profile, turn)
   if profile.properties.weight_name == 'cyclability' then
     turn.weight = turn.duration
   end
+  if turn.source_mode == mode.cycling and turn.target_mode ~= mode.cycling then
+    turn.weight = turn.weight + 30
+  end
 end
 
 return {
